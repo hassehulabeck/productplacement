@@ -1,8 +1,13 @@
 var products = [];
 var url = "https://www.hulabeck.se/html/temp/products.json";
 var productList = document.getElementById("productList");
+var shoppingCartBtn = document.getElementById('shoppingCartBtn');
+var modal = document.getElementById('cart');
+var closer = document.getElementsByClassName("close")[0];
+var cartContent = document.getElementById('cartContent');
 var xhr = new XMLHttpRequest;
 var cart = [];
+var total = 0;
 
 const images = [
     "https://media.rs-online.com/t_large/R506954-01.jpg",
@@ -56,5 +61,28 @@ productList.addEventListener('click', (e) => {
     if (e.target.nodeName == "BUTTON") {
         let productId = e.target.id;
         cart.push(products[productId]);
+        total += products[productId].consumerPrice;
     }
 })
+
+shoppingCartBtn.addEventListener('click', () => {
+    let cartStr = "";
+    cart.forEach((product) => {
+        cartStr += `${product.name}<span class="cartprice">${product.consumerPrice}</span><br 7>`
+    })
+    cartStr += `<p>Totalt: <span class="cartprice">${total}</span></p>`
+    cartContent.innerHTML = cartStr;
+    modal.style.display = "block";
+})
+
+// When the user clicks on <span> (x), close the modal
+closer.onclick = function() {
+    modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
