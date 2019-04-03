@@ -8,6 +8,7 @@ var cartContent = document.getElementById('cartContent');
 var xhr = new XMLHttpRequest;
 var cart = [];
 var total = 0;
+var removers; // Ska lagra kryss framför produkter i varukorgen.
 
 const images = [
     "https://media.rs-online.com/t_large/R506954-01.jpg",
@@ -24,7 +25,6 @@ const images = [
 
 xhr.onreadystatechange = function() {
     if ((xhr.status == 200) && (xhr.readyState == 4)) {
-        console.log(xhr.response);
         products = xhr.response.products;
         render();
     }
@@ -66,14 +66,22 @@ productList.addEventListener('click', (e) => {
 })
 
 shoppingCartBtn.addEventListener('click', () => {
+    renderCart();
+})
+
+function renderCart() {
     let cartStr = "";
-    cart.forEach((product) => {
-        cartStr += `${product.name}<span class="cartprice">${product.consumerPrice}</span><br 7>`
+    cart.forEach((product, index) => {
+        cartStr += `
+    <span class='removeProd' id="${index}">&times;</span> ${product.name}
+    <span class="cartprice">${product.consumerPrice}</span>
+    
+    <br />`
     })
     cartStr += `<p>Totalt: <span class="cartprice">${total}</span></p>`
     cartContent.innerHTML = cartStr;
     modal.style.display = "block";
-})
+}
 
 // When the user clicks on <span> (x), close the modal
 closer.onclick = function() {
@@ -86,3 +94,15 @@ window.onclick = function(event) {
         modal.style.display = "none";
     }
 }
+
+// Referens till element för att ta bort grejer.
+cartContent.addEventListener('click', (e) => {
+    if (e.target.className == "removeProd") {
+        /* Ta fram priset på produkten, för att dra av det från total */
+        let price = cart[e.target.id].consumerPrice;
+        total -= price;
+        /* Ta bort produkten från cart */
+        cart.splice(e.target.id, 1);
+        renderCart();
+    }
+})
