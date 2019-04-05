@@ -23,6 +23,7 @@ const images = [
     "https://shopcdn.textalk.se/shop/ws16/70416/art16/h5182/134635182-origpic-2b63ff.jpg?max-width=1080&max-height=1080&quality=80"
 ]
 
+// Hämta produktdata
 xhr.onreadystatechange = function() {
     if ((xhr.status == 200) && (xhr.readyState == 4)) {
         products = xhr.response.products;
@@ -43,8 +44,9 @@ function render() {
         let card = document.createElement("div");
         let image = images[index];
         card.innerHTML = `
-        
-            <img src="${image}" alt="${product.categories[0]}">
+            <div>
+              <img src="${image}" alt="${product.categories[0]}">
+            </div>
             <h1>${product.name}</h1>
             <p class="price">${product.consumerPrice}:-</p>
             <p class="description">${product.description}</p>
@@ -66,6 +68,7 @@ productList.addEventListener('click', (e) => {
 })
 
 shoppingCartBtn.addEventListener('click', () => {
+    modal.classList.toggle('showModal');
     renderCart();
 })
 
@@ -80,23 +83,24 @@ function renderCart() {
     })
     cartStr += `<p>Totalt: <span class="cartprice">${total}</span></p>`
     cartContent.innerHTML = cartStr;
-    modal.style.display = "block";
+    //modal.style.display = "block";
 }
 
-// When the user clicks on <span> (x), close the modal
-closer.onclick = function() {
-    modal.style.display = "none";
-}
+closer.addEventListener('click', () => {
+    modal.classList.toggle('showModal');
+})
 
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
     if (event.target == modal) {
-        modal.style.display = "none";
+        modal.classList.toggle('showModal');
     }
 }
 
 // Referens till element för att ta bort grejer.
-cartContent.addEventListener('click', (e) => {
+cartContent.addEventListener('click', removeProducts)
+
+function removeProducts(e) {
     if (e.target.className == "removeProd") {
         /* Ta fram priset på produkten, för att dra av det från total */
         let price = cart[e.target.id].consumerPrice;
@@ -105,4 +109,8 @@ cartContent.addEventListener('click', (e) => {
         cart.splice(e.target.id, 1);
         renderCart();
     }
-})
+}
+
+function remEveListener() {
+    cartContent.removeEventListener('click', removeProducts);
+}
